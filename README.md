@@ -1,6 +1,6 @@
 # Bookly
 
-Base full stack do Bookly, preparada na etapa 00. Inclui apenas configuração compartilhada, PostgreSQL, healthcheck e uma página temporária de integração.
+Bookly é um sistema de agendamentos online para profissionais e prestadores de serviços. A etapa 00 preparou a infraestrutura full stack; a etapa 01 adicionou a identidade visual, o dashboard responsivo e a navegação do frontend. O painel utiliza estados vazios e ainda não cria ou persiste dados de negócio.
 
 ## Stack
 
@@ -68,7 +68,9 @@ Frontend, em outro terminal:
 npm --prefix apps/web run dev
 ```
 
-Abra <http://localhost:3000>. A página consulta <http://localhost:3001/api/health> no navegador e mostra carregamento, conexão confirmada ou falha. A consulta tem limite de 10 segundos.
+Abra <http://localhost:3000> e use **Explorar demonstração** para acessar <http://localhost:3000/dashboard>. O painel contém visão geral, calendário, agendamentos, serviços, disponibilidade e configurações. O calendário permite navegar entre datas e períodos sem criar reservas.
+
+O indicador discreto da API fica no header do dashboard e no rodapé da página inicial. Ele consulta <http://localhost:3001/api/health> no navegador, com estados de carregamento, conexão e falha, limite de 10 segundos e botão para consultar novamente.
 
 ## Variáveis locais
 
@@ -89,6 +91,7 @@ Variáveis `NEXT_PUBLIC_*` são incorporadas no build: reinicie o desenvolviment
 # Frontend
 npm --prefix apps/web run lint
 npm --prefix apps/web run typecheck
+npm --prefix apps/web test
 npm --prefix apps/web run build
 
 # Backend
@@ -134,3 +137,5 @@ Nesta etapa, o schema não possui modelos e não há migrações a aplicar. Não
 Para interromper somente o banco, use `docker compose stop postgres`. Preserve o volume existente: não utilize resets nem comandos que removam volumes.
 
 O [relatório da etapa 00](docs/etapa-00-auditoria.md) registra os problemas encontrados, os arquivos alterados, as verificações executadas e os alertas de dependências pendentes.
+
+O [relatório da etapa 01](docs/etapa-01-interface.md) descreve as páginas, os componentes, os tokens visuais, as interações e a validação do frontend. Os módulos de negócio, autenticação e persistência continuam reservados às próximas etapas.
