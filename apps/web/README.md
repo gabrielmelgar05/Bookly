@@ -1,6 +1,6 @@
 # Bookly Web
 
-Frontend Next.js 16 com App Router, React, TypeScript, Tailwind CSS e Lucide React. A etapa 01 implementa a apresentação do produto e a interface do dashboard, sem autenticação, CRUD ou persistência de dados.
+Frontend Next.js 16 com App Router, React, TypeScript, Tailwind CSS e Lucide React. A etapa 01 implementa a interface; a etapa 02 adiciona autenticação por sessão. Os demais módulos de negócio continuam sem CRUD ou persistência.
 
 Consulte o [README principal](../../README.md) para preparar a infraestrutura. O arquivo `.env.local` mantém:
 
@@ -15,13 +15,15 @@ npm ci
 npm run dev
 ```
 
-Abra <http://localhost:3000> e use **Explorar demonstração**. A API e o PostgreSQL são necessários para o indicador de conexão ficar online; todas as páginas e a navegação continuam disponíveis quando a API está inacessível.
+Abra <http://localhost:3000> e use **Criar minha conta**, ou acesse `/login`. A API e o PostgreSQL são necessários para o indicador de conexão ficar online; o dashboard exige confirmação da sessão pelo backend. A página inicial permanece pública.
 
 ## Rotas
 
 | Rota | Interface |
 | --- | --- |
 | `/` | Apresentação breve do Bookly e acesso à demonstração |
+| `/register` | Cadastro com validação e confirmação de senha |
+| `/login` | Login com retorno seguro ao destino solicitado |
 | `/dashboard` | Métricas indisponíveis, próximos agendamentos vazios, calendário e primeiros passos |
 | `/dashboard/calendar` | Calendário mensal, semanal e diário, com seleção e navegação de datas |
 | `/dashboard/bookings` | Estrutura da listagem, busca e filtros futuros, estado vazio |
@@ -65,8 +67,22 @@ npm run build
 npm run start
 ```
 
-Os sete testes do frontend cobrem limites de meses e anos, ano bissexto, grade de calendário, semana, fusos/horário de verão e rejeição de respostas incompletas do healthcheck. Eles não dependem do backend ou de bibliotecas extras. O runner usa um único processo; a variável de fuso é restaurada após o teste. O Node pode emitir `MODULE_TYPELESS_PACKAGE_JSON` ao detectar o ESM dos utilitários TypeScript fora do Next.js; esse aviso não é erro e o sistema de módulos do projeto foi preservado.
+Os sete testes preservados da etapa 01 cobrem limites de meses e anos, ano bissexto, grade de calendário, semana, fusos/horário de verão e rejeição de respostas incompletas do healthcheck. Eles não dependem do backend ou de bibliotecas extras. O runner usa um único processo; a variável de fuso é restaurada após o teste. O Node pode emitir `MODULE_TYPELESS_PACKAGE_JSON` ao detectar o ESM dos utilitários TypeScript fora do Next.js; esse aviso não é erro e o sistema de módulos do projeto foi preservado.
 
 O build não consulta a API. A chamada é feita no navegador após carregar a página. Refaça o build quando mudar `NEXT_PUBLIC_API_URL`.
 
 O loader `@tailwindcss/turbopack`, os tsconfigs, o ambiente e os lockfiles da infraestrutura foram preservados. A documentação completa e os resultados da validação estão no [relatório da etapa 01](../../docs/etapa-01-interface.md).
+
+## Sessões e testes de autenticação
+
+Todas as páginas `/dashboard/*` consultam a sessão no servidor Next.js. O `proxy.ts` só faz a verificação preliminar do cookie; a confirmação definitiva é feita por `/api/auth/me`. Cookies privados são encaminhados explicitamente e as respostas não usam cache persistente.
+
+O header mostra o nome real da sessão e permite sair da conta. O logout revoga o registro no PostgreSQL, limpa o cookie e renova a navegação do Next.js. Nenhum token é colocado em localStorage ou sessionStorage.
+
+O cliente `src/lib/api-client.ts` trata credenciais, JSON, timeout, erros de rede e HTTP 400/401/403/409/429/5xx. Os formulários usam POST também no HTML, evitando senhas em query strings antes da hidratação.
+
+`npm test` executa os sete testes anteriores e os 37 testes de autenticação com Vitest. A configuração ESM fica em `vitest.config.mts`; Testing Library e jsdom verificam os formulários e os estados de interação. Use `npm run test:auth` para executar apenas a suíte nova.
+
+Em produção, frontend e API devem compartilhar o hostname, normalmente expondo o Nest em `/api` por um proxy reverso. O cookie host-only precisa chegar também ao servidor Next.js. Use HTTPS e mantenha `NEXT_PUBLIC_API_URL` coerente com essa origem.
+
+Consulte [etapa 02](../../docs/etapa-02-autenticacao.md) para as decisões de segurança, o inventário de arquivos e as verificações completas.

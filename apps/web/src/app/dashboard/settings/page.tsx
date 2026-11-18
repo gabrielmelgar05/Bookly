@@ -1,3 +1,4 @@
+import { requireUser } from "@/lib/auth-server";
 import type { Metadata } from "next";
 import { Bell, ShieldCheck, SlidersHorizontal, UserRound } from "lucide-react";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -8,7 +9,8 @@ import { TimezoneCard } from "@/features/settings/timezone-card";
 
 export const metadata: Metadata = { title: "Configurações" };
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const user = await requireUser();
   return (
     <div className="page-stack">
       <PageHeading
@@ -31,7 +33,7 @@ export default function SettingsPage() {
           <dl className="settings-values">
             <div>
               <dt>Nome de exibição</dt>
-              <dd>Não informado</dd>
+              <dd>{user.name}</dd>
             </div>
             <div>
               <dt>Área de atuação</dt>
@@ -53,11 +55,11 @@ export default function SettingsPage() {
           <dl className="settings-values">
             <div>
               <dt>E-mail</dt>
-              <dd>Não informado</dd>
+              <dd>{user.email}</dd>
             </div>
             <div>
               <dt>Acesso à conta</dt>
-              <dd>Não configurado</dd>
+              <dd>Sessão ativa</dd>
             </div>
           </dl>
         </Card>

@@ -1,6 +1,6 @@
 # Bookly
 
-Bookly é um sistema de agendamentos online para profissionais e prestadores de serviços. A etapa 00 preparou a infraestrutura full stack; a etapa 01 adicionou a identidade visual, o dashboard responsivo e a navegação do frontend. O painel utiliza estados vazios e ainda não cria ou persiste dados de negócio.
+Bookly é um sistema de agendamentos online para profissionais e prestadores de serviços. A etapa 00 preparou a infraestrutura full stack; a etapa 01 adicionou a identidade visual, o dashboard responsivo e a navegação do frontend. A etapa 02 adicionou cadastro, login, sessões persistidas e proteção do dashboard. Os demais módulos de negócio continuam com estados vazios.
 
 ## Stack
 
@@ -28,7 +28,7 @@ Bookly/
 └── README.md
 ```
 
-Os módulos Auth, Users, Professionals, Services, Availability e Bookings serão adicionados nas respectivas etapas de desenvolvimento.
+A autenticação está em `apps/server/src/modules/auth`. O perfil comercial e os módulos de serviços, disponibilidade e reservas serão desenvolvidos nas próximas etapas.
 
 ## Preparação
 
@@ -41,6 +41,7 @@ cp -n apps/web/.env.example apps/web/.env.local
 npm --prefix apps/server ci
 npm --prefix apps/web ci
 docker compose up -d --wait postgres
+npm --prefix apps/server run prisma:deploy
 npm --prefix apps/server run prisma:status
 ```
 
@@ -68,7 +69,7 @@ Frontend, em outro terminal:
 npm --prefix apps/web run dev
 ```
 
-Abra <http://localhost:3000> e use **Explorar demonstração** para acessar <http://localhost:3000/dashboard>. O painel contém visão geral, calendário, agendamentos, serviços, disponibilidade e configurações. O calendário permite navegar entre datas e períodos sem criar reservas.
+Abra <http://localhost:3000> e use **Criar minha conta**, ou entre em <http://localhost:3000/login>. Todas as rotas de <http://localhost:3000/dashboard> exigem uma sessão válida. O painel contém visão geral, calendário, agendamentos, serviços, disponibilidade e configurações. O calendário permite navegar entre datas e períodos sem criar reservas.
 
 O indicador discreto da API fica no header do dashboard e no rodapé da página inicial. Ele consulta <http://localhost:3001/api/health> no navegador, com estados de carregamento, conexão e falha, limite de 10 segundos e botão para consultar novamente.
 
@@ -79,6 +80,7 @@ O indicador discreto da API fica no header do dashboard e no rodapé da página 
 | Server | `DATABASE_URL` | `postgresql://bookly:bookly_dev@localhost:5434/bookly?schema=public` |
 | Server | `PORT` | `3001` |
 | Server | `CORS_ORIGIN` | `http://localhost:3000` |
+| Server | `NODE_ENV` | `development` |
 | Web | `NEXT_PUBLIC_API_URL` | `http://localhost:3001/api` |
 
 As credenciais do Compose são exclusivamente locais. O PostgreSQL é exposto em `127.0.0.1:5434`, com armazenamento persistente no volume `bookly_bookly_postgres_data`. O Nest valida o ambiente ao iniciar e rejeita configurações inválidas. `CORS_ORIGIN` aceita uma única origem, sem barra final ou caminho.
@@ -109,7 +111,7 @@ docker compose ps
 curl --fail http://localhost:3001/api/health
 ```
 
-Os testes unitários não consultam o banco. Os testes e2e precisam do PostgreSQL e da configuração em `apps/server/.env`; fazem consultas, sem criar tabelas ou gravar dados. A rota usada para testar o ValidationPipe existe somente no módulo de testes.
+Os testes unitários não consultam o banco. Os testes e2e precisam do PostgreSQL e da configuração em `apps/server/.env`. Os testes de autenticação criam contas sintéticas com identificadores aleatórios e removem somente os próprios registros ao terminar; dados anteriores são preservados. A rota usada para testar o ValidationPipe existe somente no módulo de testes.
 
 O healthcheck executa `SELECT 1` via Prisma e responde HTTP 200:
 
@@ -132,10 +134,12 @@ npm --prefix apps/web run start
 
 ## Migrações e dados
 
-Nesta etapa, o schema não possui modelos e não há migrações a aplicar. Não foi criada uma migração artificial. Quando houver alterações reais de schema, crie e revise uma migração de desenvolvimento; aplique migrações revisadas com `npm --prefix apps/server run prisma:deploy`.
+A migração `20261117210000_create_authentication` cria apenas `User` e `Session`, seus índices e relacionamento. Aplique as migrações revisadas com `npm --prefix apps/server run prisma:deploy`. Não use reset para preparar o ambiente.
 
 Para interromper somente o banco, use `docker compose stop postgres`. Preserve o volume existente: não utilize resets nem comandos que removam volumes.
 
 O [relatório da etapa 00](docs/etapa-00-auditoria.md) registra os problemas encontrados, os arquivos alterados, as verificações executadas e os alertas de dependências pendentes.
 
-O [relatório da etapa 01](docs/etapa-01-interface.md) descreve as páginas, os componentes, os tokens visuais, as interações e a validação do frontend. Os módulos de negócio, autenticação e persistência continuam reservados às próximas etapas.
+O [relatório da etapa 01](docs/etapa-01-interface.md) descreve as páginas, os componentes, os tokens visuais, as interações e a validação do frontend. O relatório descreve o estado da interface ao concluir aquela etapa.
+
+A [documentação da etapa 02](docs/etapa-02-autenticacao.md) explica os endpoints, cookies, CSRF, limites de tentativas, testes e requisitos de implantação da autenticação.

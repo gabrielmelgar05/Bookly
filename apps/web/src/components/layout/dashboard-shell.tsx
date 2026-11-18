@@ -8,12 +8,20 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Menu, UserRound } from "lucide-react";
+import { ChevronRight, Menu } from "lucide-react";
+import { AccountMenu } from "@/features/auth/account-menu";
+import type { PublicUser } from "@/types/auth";
 import { ApiStatus } from "@/components/shared/api-status";
 import { navigation, isActiveRoute } from "@/lib/navigation";
 import { Sidebar } from "./sidebar";
 
-export function DashboardShell({ children }: { children: ReactNode }) {
+export function DashboardShell({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: PublicUser;
+}) {
   const pathname = usePathname();
   const page = navigation.find(({ href }) => isActiveRoute(pathname, href));
   const dialog = useRef<HTMLDialogElement>(null);
@@ -112,13 +120,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           <div className="header-actions">
             <ApiStatus />
             <span className="header-divider" />
-            <span
-              className="account-placeholder"
-              title="Menu da conta disponível em breve"
-            >
-              <UserRound size={17} aria-hidden="true" />
-              <span className="sr-only">Menu da conta disponível em breve</span>
-            </span>
+            <AccountMenu user={user} />
           </div>
         </header>
         <main id="main-content" className="dashboard-main" tabIndex={-1}>

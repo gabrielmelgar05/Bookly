@@ -1,3 +1,4 @@
+import { requireUser } from "@/lib/auth-server";
 import type { Metadata } from "next";
 import {
   CalendarCheck2,
@@ -15,7 +16,8 @@ import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = { title: "Agendamentos" };
 
-export default function BookingsPage() {
+export default async function BookingsPage() {
+  await requireUser();
   return (
     <div className="page-stack">
       <PageHeading

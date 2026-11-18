@@ -1,3 +1,4 @@
+import { requireUser } from "@/lib/auth-server";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,7 +17,8 @@ import { StatCard } from "@/features/dashboard/stat-card";
 import { TodayLabel } from "@/features/dashboard/today-label";
 import { AgendaOverview } from "@/features/calendar/agenda-overview";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await requireUser();
   return (
     <div className="page-stack">
       <PageHeading

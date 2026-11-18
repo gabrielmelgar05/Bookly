@@ -1,3 +1,4 @@
+import { requireUser } from "@/lib/auth-server";
 import type { Metadata } from "next";
 import { Clock3, Layers3, Plus, Tag, TextAlignStart } from "lucide-react";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -9,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = { title: "Serviços" };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  await requireUser();
   return (
     <div className="page-stack">
       <PageHeading

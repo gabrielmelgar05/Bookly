@@ -1,3 +1,4 @@
+import { requireUser } from "@/lib/auth-server";
 import type { Metadata } from "next";
 import { Clock3, Info, Plus } from "lucide-react";
 import { PageHeading } from "@/components/shared/page-heading";
@@ -15,7 +16,8 @@ const days = [
   { short: "DOM", name: "Domingo" },
 ];
 
-export default function AvailabilityPage() {
+export default async function AvailabilityPage() {
+  await requireUser();
   return (
     <div className="page-stack">
       <PageHeading

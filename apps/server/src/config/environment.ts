@@ -24,6 +24,13 @@ export function validateEnvironment(config: Record<string, unknown>) {
   }
 
   const corsOrigin = config.CORS_ORIGIN ?? 'http://localhost:3000';
+  const nodeEnv = config.NODE_ENV ?? 'development';
+  if (
+    typeof nodeEnv !== 'string' ||
+    !['development', 'test', 'production'].includes(nodeEnv)
+  ) {
+    throw new Error('NODE_ENV deve ser development, test ou production.');
+  }
   try {
     if (typeof corsOrigin !== 'string') {
       throw new Error();
@@ -33,6 +40,16 @@ export function validateEnvironment(config: Record<string, unknown>) {
     if (
       !['http:', 'https:'].includes(url.protocol) ||
       url.origin !== corsOrigin
+    ) {
+      throw new Error();
+    }
+    if (nodeEnv === 'production' && url.protocol !== 'https:') {
+      throw new Error();
+    }
+    if (
+      nodeEnv !== 'production' &&
+      url.protocol === 'http:' &&
+      !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
     ) {
       throw new Error();
     }
@@ -47,5 +64,7 @@ export function validateEnvironment(config: Record<string, unknown>) {
     DATABASE_URL: databaseUrl,
     PORT: port,
     CORS_ORIGIN: corsOrigin,
+    NODE_ENV: nodeEnv,
+    SESSION_COOKIE_SECURE: new URL(String(corsOrigin)).protocol === 'https:',
   };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiRequest } from "@/lib/api-client";
 import { isHealthyResponse, type ApiConnection } from "@/types/health";
 
 export function useApiHealth() {
@@ -10,24 +11,16 @@ export function useApiHealth() {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
-    const timeout = window.setTimeout(() => controller.abort(), 10000);
 
     async function check() {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) throw new Error("API URL missing");
-        const response = await fetch(`${apiUrl.replace(/\/$/, "")}/health`, {
-          cache: "no-store",
+        const value = await apiRequest<unknown>("/health", {
           signal: controller.signal,
         });
-        if (!response.ok || !isHealthyResponse(await response.json())) {
-          throw new Error("Health check failed");
-        }
+        if (!isHealthyResponse(value)) throw new Error("Health check failed");
         if (active) setConnection("connected");
       } catch {
         if (active) setConnection("error");
-      } finally {
-        window.clearTimeout(timeout);
       }
     }
 
@@ -35,7 +28,6 @@ export function useApiHealth() {
     return () => {
       active = false;
       controller.abort();
-      window.clearTimeout(timeout);
     };
   }, [attempt]);
 

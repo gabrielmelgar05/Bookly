@@ -22,11 +22,11 @@ export default function Home() {
       <header className="landing-header">
         <Brand />
         <div className="landing-navigation">
-          <Link href="/dashboard" className="landing-text-link">
-            Conheça seu espaço
+          <Link href="/login" className="landing-text-link">
+            Entrar
           </Link>
-          <ButtonLink href="/dashboard" variant="secondary" compact>
-            Explorar painel <ArrowUpRight size={15} aria-hidden="true" />
+          <ButtonLink href="/register" variant="secondary" compact>
+            Criar conta <ArrowUpRight size={15} aria-hidden="true" />
           </ButtonLink>
         </div>
       </header>
@@ -44,8 +44,8 @@ export default function Home() {
             Um lugar para organizar seus serviços, planejar sua disponibilidade
             e acompanhar cada agendamento. Com mais clareza, do seu jeito.
           </p>
-          <ButtonLink href="/dashboard" className="landing-cta">
-            Explorar demonstração <ArrowRight size={18} aria-hidden="true" />
+          <ButtonLink href="/register" className="landing-cta">
+            Criar minha conta <ArrowRight size={18} aria-hidden="true" />
           </ButtonLink>
           <p className="landing-reassurance">
             <Check size={15} aria-hidden="true" /> Explore o painel. Nenhum
